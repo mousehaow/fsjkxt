@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @EnableWebSocket
@@ -12,6 +13,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 @EnableAsync
 @EnableScheduling
 @EnableTransactionManagement
+@RequestMapping(value = "/api")
 public class FsjkxtApplication {
 
 	public static void main(String[] args) {
