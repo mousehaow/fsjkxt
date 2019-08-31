@@ -54,7 +54,7 @@ public class TokenManagerImpl implements TokenManager {
     }
 
     @Override
-    public void deleteToken(String userId) {
-        redisTemplate.delete(userId.toString());
+    public void deleteToken(String token) {
+        redisTemplate.delete(token);
     }
 }

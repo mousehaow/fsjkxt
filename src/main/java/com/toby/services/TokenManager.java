@@ -11,5 +11,5 @@ public interface TokenManager {
 
     TokenModel getToken(String authentication);
 
-    void deleteToken(String userId);
+    void deleteToken(String token);
 }
