@@ -11,7 +11,6 @@ import com.toby.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 
 @RestController
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/api/user")
 public class LoginController {
 
     @Autowired
@@ -39,7 +38,7 @@ public class LoginController {
         } else if (!userInfo.getPassword().equals(password)) {
             return new ResponseEntity<>(ResultModel.error(ResultStatus.USERNAME_OR_PASSWORD_ERROR), HttpStatus.NOT_FOUND);
         }
-        TokenModel model = tokenManager.createToken(userInfo.getId(), userInfo.getAuthority());
+        TokenModel model = tokenManager.createToken(userInfo.getId());
         userInfo.setPassword(null);
         model.setUser(userInfo);
         return new ResponseEntity<>(ResultModel.ok(model), HttpStatus.OK);

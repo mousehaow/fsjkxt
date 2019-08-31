@@ -30,14 +30,13 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
     public void onMessage(Message message, byte[] pattern) {
         // 用户做自己的业务处理即可,注意message.toString()可以获取失效的key
         String expiredKey = message.toString();
-        if(expiredKey.startsWith("Equip:")){
-            Map<String, Object> result = new HashMap<>();
-            result.put("topic", "equipOffLine");
-            try {
-                messageProducer.sendTopic(new ObjectMapper().writeValueAsString(result));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+        Map<String, Object> result = new HashMap<>();
+        result.put("userOffline", expiredKey);
+        try {
+            messageProducer.sendTopic(new ObjectMapper().writeValueAsString(result));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
+
     }
 }

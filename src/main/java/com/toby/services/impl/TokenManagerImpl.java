@@ -18,14 +18,14 @@ public class TokenManagerImpl implements TokenManager {
     private RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public TokenModel createToken(String userId, int auth) {
+    public TokenModel createToken(String userId) {
 
         String token = UUID.randomUUID().toString().replace("-", "");
 
-        TokenModel model = new TokenModel(userId, token, auth);
+        TokenModel model = new TokenModel(userId, token);
 
         //存储到redis并设置过期时间
-        redisTemplate.boundValueOps(userId.toString()).set(token, Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);
+        redisTemplate.boundValueOps(token).set(userId.toString(), Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);
         return model;
     }
 
@@ -35,11 +35,12 @@ public class TokenManagerImpl implements TokenManager {
         if (model == null) {
             return false;
         }
-        String token = redisTemplate.boundValueOps(model.getUserId().toString()).get();
-        if (token == null || !token.equals(model.getToken())) {
+        String id = redisTemplate.boundValueOps(model.getToken()).get();
+        if (id == null || id.length() == 0) {
             return false;
         }
-        redisTemplate.boundValueOps(model.getUserId().toString()).expire(Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);
+        model.setUserId(id);
+        redisTemplate.boundValueOps(model.getToken()).expire(Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);
         return true;
     }
 
@@ -49,15 +50,7 @@ public class TokenManagerImpl implements TokenManager {
         if (authentication == null || authentication.length() == 0) {
             return null;
         }
-        String[] param = authentication.split("_");
-        if (param.length != 3) {
-            return null;
-        }
-        String userId = param[0];
-        String token = param[1];
-        int auth = Integer.valueOf(param[2]);
-
-        return new TokenModel(userId, token, auth);
+        return new TokenModel(authentication);
     }
 
     @Override

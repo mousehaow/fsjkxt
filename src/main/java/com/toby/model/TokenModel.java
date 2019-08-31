@@ -6,15 +6,17 @@ public class TokenModel {
 
     private String token;
 
-    private int auth;
-
     private User user;
 
-    public TokenModel(String userId, String token, int auth) {
+    public TokenModel(String userId, String token) {
         this.userId = userId;
         this.token = token;
-        this.auth = auth;
     }
+
+    public TokenModel(String token) {
+        this.token = token;
+    }
+
 
     public String getUserId() {
         return userId;
@@ -30,14 +32,6 @@ public class TokenModel {
 
     public void setToken(String token) {
         this.token = token;
-    }
-
-    public int getAuth() {
-        return auth;
-    }
-
-    public void setAuth(int auth) {
-        this.auth = auth;
     }
 
     public User getUser() {

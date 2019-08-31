@@ -5,7 +5,7 @@ import com.toby.model.TokenModel;
 
 public interface TokenManager {
 
-    TokenModel createToken(String userId, int auth);
+    TokenModel createToken(String userId);
 
     boolean checkToken(TokenModel model);
 
