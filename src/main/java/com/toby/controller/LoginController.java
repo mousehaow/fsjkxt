@@ -1,13 +1,11 @@
 package com.toby.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.toby.annotation.Authorization;
 import com.toby.annotation.CurrentUser;
 import com.toby.conf.Constants;
 import com.toby.conf.ResultStatus;
-import com.toby.model.RecordModel;
 import com.toby.model.ResultModel;
 import com.toby.model.TokenModel;
 import com.toby.model.User;
@@ -19,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+
 
 @RestController
 @RequestMapping(value = "/api/user")

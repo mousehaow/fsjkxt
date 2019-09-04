@@ -4,9 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.toby.model.TokenModel;
 import com.toby.services.TokenManager;
+import com.toby.utils.ApplicationContextRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
@@ -22,19 +23,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class UserWebSocket {
 
-    private static Logger log = LoggerFactory.getLogger(DataUploadWebSocket.class);
+    private static Logger log = LoggerFactory.getLogger(UserWebSocket.class);
     private static final AtomicInteger OnlineCount = new AtomicInteger(0);
     // concurrent包的线程安全Map，用来存放每个客户端对应的Session对象。
     private static final Map<Session, String> SessionMap = new ConcurrentHashMap<>();
-
-    @Autowired
-    private TokenManager tokenManager;
 
     /**
      * 连接建立成功调用的方法
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("uid") String uid) {
+        ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+        TokenManager tokenManager = act.getBean(TokenManager.class);
         TokenModel token = tokenManager.getToken(uid);
         if (token == null) {
             try {
@@ -52,7 +52,8 @@ public class UserWebSocket {
             }
             return;
         }
-        SessionMap.put(session, uid + "_" + token.getUserId());
+        //SessionMap.put(session, uid + "_" + token.getUserId());
+        SessionMap.put(session, uid);
         int cnt = OnlineCount.incrementAndGet(); // 在线数加1
         log.info("有连接加入，当前连接数为：{}", cnt);
         //SendMessage(session, "连接成功");
@@ -127,12 +128,10 @@ public class UserWebSocket {
 
     @JmsListener(destination = "fsjkxt.topic")
     public void receiveTopic(String text) {
+        log.info("get user offline " + text);
         JSONObject jsonObject = JSON.parseObject(text);
         if (jsonObject.containsKey("userOffline")) {
-            String tokenAndId = jsonObject.getString("userOffline");
-            String[] param = tokenAndId.split("_");
-            String token = param[0];
-            String userId = param[1];
+            String token = jsonObject.getString("userOffline");
             Session session = null;
             for (Session s : SessionMap.keySet()) {
                 if(SessionMap.get(s).equals(token)){
@@ -153,7 +152,7 @@ public class UserWebSocket {
                 }
             }
             else{
-                log.warn("没有找到你指定ID的会话：{}",userId);
+                log.warn("没有找到你指定ID的会话：{}");
             }
         }
 

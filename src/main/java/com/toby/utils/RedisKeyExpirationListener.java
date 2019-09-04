@@ -2,6 +2,9 @@ package com.toby.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.toby.controller.UserWebSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
@@ -13,6 +16,8 @@ import java.util.Map;
 
 @Component
 public class RedisKeyExpirationListener extends KeyExpirationEventMessageListener {
+
+    private static Logger log = LoggerFactory.getLogger(RedisKeyExpirationListener.class);
 
     @Autowired
     MessageProducer messageProducer;
@@ -34,6 +39,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
         result.put("userOffline", expiredKey);
         try {
             messageProducer.sendTopic(new ObjectMapper().writeValueAsString(result));
+            log.info("send user offline");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
