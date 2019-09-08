@@ -6,9 +6,11 @@ import com.toby.model.DetailModel;
 import com.toby.model.RecordModel;
 import com.toby.services.DetailService;
 import com.toby.services.RecordService;
+import com.toby.services.TokenManager;
+import com.toby.utils.ApplicationContextRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -29,19 +31,18 @@ public class DataUploadWebSocket {
 
     static final Map<String, String> CurrentRecordMap = new ConcurrentHashMap<>();
 
-    @Autowired
-    private RecordService recordService;
-
-    @Autowired
-    private DetailService detailService;
-
-
     /**
      * 连接建立成功调用的方法
      */
     @OnOpen
     public void onOpen(Session session) {
-        String recordID = recordService.createNewRecord(new RecordModel());
+        RecordModel recordModel = new RecordModel();
+        recordModel.setCount(0);
+        recordModel.setTotalDose(0.0);
+        ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+        RecordService recordService = act.getBean(RecordService.class);
+        String recordID = recordService.createNewRecord(recordModel);
+        log.warn(recordID);
         SessionMap.put(session, recordID);
         int cnt = OnlineCount.incrementAndGet(); // 在线数加1
         log.info("有连接加入，当前连接数为：{}", cnt);
@@ -68,20 +69,27 @@ public class DataUploadWebSocket {
      */
     @OnMessage
     public void onMessage(String message, Session session) {
-        log.info("来自客户端的消息：{}",message);
+        //log.info("来自客户端的消息：{}",message);
         JSONObject jsonObject = JSON.parseObject(message);
         String recordId = SessionMap.get(session);
+        log.warn(recordId);
         if (recordId == null || recordId.equals("")) {
             return;
         }
         if (jsonObject.getString("type").equals("recordInit")) {
             RecordModel record = JSON.parseObject(jsonObject.getString("data"), RecordModel.class);
             record.setId(recordId);
+            record.setCount(0);
+            record.setTotalDose(0.0);
+            ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+            RecordService recordService = act.getBean(RecordService.class);
             recordService.updateRecord(record);
         }
         if (jsonObject.getString("type").equals("detailInsert")) {
             DetailModel detail = JSON.parseObject(jsonObject.getString("data"), DetailModel.class);
             detail.setRecordId(recordId);
+            ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+            DetailService detailService = act.getBean(DetailService.class);
             detailService.addNewDetail(detail);
             CurrentRecordMap.put(recordId, jsonObject.getString("data"));
         }

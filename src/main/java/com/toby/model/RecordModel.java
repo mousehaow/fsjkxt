@@ -32,6 +32,15 @@ public class RecordModel implements Serializable {
     private Integer count;
 
     @Column
+    private String country;
+
+    @Column
+    private String province;
+
+    @Column
+    private String city;
+
+    @Column
     private String localDes;
 
     @Column
@@ -43,7 +52,7 @@ public class RecordModel implements Serializable {
     @Column
     private Integer recordType;
 
-    @Column(nullable = false)
+    @Column
     private String equipAddress;
 
     @Column
@@ -162,5 +171,29 @@ public class RecordModel implements Serializable {
 
     public void setOverThreshold(Boolean overThreshold) {
         this.overThreshold = overThreshold;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

@@ -28,6 +28,12 @@ public class DetailModel implements Serializable {
     private Date timeStamp;
 
     @Column
+    private Double longitude;
+
+    @Column
+    private Double latitude;
+
+    @Column
     private String equipAddress;
 
     @Column(nullable = false)
@@ -83,5 +89,21 @@ public class DetailModel implements Serializable {
 
     public void setRecordId(String recordId) {
         this.recordId = recordId;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 }
