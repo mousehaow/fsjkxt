@@ -6,7 +6,6 @@ import com.toby.model.DetailModel;
 import com.toby.model.RecordModel;
 import com.toby.services.DetailService;
 import com.toby.services.RecordService;
-import com.toby.services.TokenManager;
 import com.toby.utils.ApplicationContextRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
