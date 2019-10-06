@@ -29,6 +29,9 @@ public class User {
     private Integer authority;
 
     @Column
+    private Integer loginCount;
+
+    @Column
     private String phoneNumber;
 
     @Column
@@ -146,5 +149,13 @@ public class User {
 
     public void setAppVersion(String appVersion) {
         this.appVersion = appVersion;
+    }
+
+    public Integer getLoginCount() {
+        return loginCount;
+    }
+
+    public void setLoginCount(Integer loginCount) {
+        this.loginCount = loginCount;
     }
 }

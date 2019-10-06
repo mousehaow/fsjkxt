@@ -46,6 +46,8 @@ public class LoginController {
                     return new ResponseEntity<>(ResultModel.error(ResultStatus.USERNAME_OR_PASSWORD_ERROR), HttpStatus.OK);
                 }
                 TokenModel model = tokenManager.createToken(userInfo.getId());
+                userInfo.setLoginCount(userInfo.getLoginCount() + 1);
+                userService.saveNewUser(userInfo);
                 userInfo.setPassword(null);
                 model.setUser(userInfo);
                 return new ResponseEntity<>(ResultModel.ok(model), HttpStatus.OK);
@@ -59,12 +61,30 @@ public class LoginController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity register(@CurrentUser User user,
                                    @RequestBody String body) {
-        if (user.getAuthority() == 0) {
-            // TODO
-            // 处理相应注册用户的权限
-            return new ResponseEntity<>(ResultModel.ok(null), HttpStatus.OK);
+        JSONObject jsonObject = JSON.parseObject(body);
+        if (jsonObject == null) {
+            return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR),  HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(ResultModel.error(ResultStatus.NO_AUTHORITY), HttpStatus.OK);
+            String oldPassword = null;
+            String newPassword = null;
+            if (jsonObject.containsKey("oldPassword")) {
+                oldPassword = jsonObject.getString("oldPassword");
+            }
+            if (jsonObject.containsKey("newPassword")) {
+                newPassword = jsonObject.getString("newPassword");
+            }
+            if (oldPassword != null && newPassword != null) {
+                User currentUser = userService.getById(user.getId());
+                if (currentUser.getPassword().equals(oldPassword)) {
+                    userService.changePassword(user.getId(), newPassword);
+                    return new ResponseEntity<>(ResultModel.ok(null), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(ResultModel.error(ResultStatus.USERNAME_OR_PASSWORD_ERROR), HttpStatus.OK);
+                }
+            } else {
+                return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR), HttpStatus.OK);
+            }
+
         }
     }
 

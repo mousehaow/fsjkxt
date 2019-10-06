@@ -4,7 +4,15 @@ import com.toby.model.RecordModel;
 import com.toby.repository.RecordRepository;
 import com.toby.services.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.Date;
 
 @Service
 public class RecordServiceImpl implements RecordService {
@@ -22,5 +30,145 @@ public class RecordServiceImpl implements RecordService {
         return recordRepository.saveAndFlush(record);
     }
 
+    @Override
+    public Page<RecordModel> getAllRecord(int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return recordRepository.findAll(pageable);
+    }
 
+    @Override
+    public Page<RecordModel> getAllRecordByTime(Date startTime, Date endTime, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<RecordModel> specification = new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.greaterThan(root.get("startTime"), startTime);
+                Predicate condition2 = criteriaBuilder.lessThan(root.get("startTime"), endTime);
+
+                return criteriaQuery.where(condition1, condition2).getRestriction();
+            }
+        };
+        return recordRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<RecordModel> getAllRecordByProvince(String province, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<RecordModel> specification = new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("province"), province);
+                return criteriaQuery.where(condition1).getRestriction();
+            }
+        };
+        return recordRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<RecordModel> getAllRecordByCity(String city, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<RecordModel> specification = new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("city"), city);
+                return criteriaQuery.where(condition1).getRestriction();
+            }
+        };
+        return recordRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<RecordModel> getAllRecordByZone(String zone, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<RecordModel> specification = new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.like(root.get("zone"), zone);
+                return criteriaQuery.where(condition1).getRestriction();
+            }
+        };
+        return recordRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<RecordModel> getAllRecordByAlarm(boolean alarm, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<RecordModel> specification = new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("overThreshold"), alarm);
+                return criteriaQuery.where(condition1).getRestriction();
+            }
+        };
+        return recordRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public Page<RecordModel> getAllRecordByType(int type, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<RecordModel> specification = new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("recordType"), type);
+                return criteriaQuery.where(condition1).getRestriction();
+            }
+        };
+        return recordRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public int getTotalCount(String equipAddress, int type) {
+        if (type < 0) {
+            return (int) recordRepository.count(new Specification<RecordModel>() {
+                @Override
+                public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                    Predicate condition1 = criteriaBuilder.equal(root.get("equipAddress"), equipAddress);
+                    return criteriaQuery.where(condition1).getRestriction();
+                }
+            });
+        }
+        return (int) recordRepository.count(new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("equipAddress"), equipAddress);
+                Predicate condition2 = criteriaBuilder.equal(root.get("recordType"), type);
+                return criteriaQuery.where(condition1, condition2).getRestriction();
+            }
+        });
+    }
+
+    @Override
+    public int getTotalCountOverThreshold(String equipAddress, boolean alarm, int type) {
+        if (type < 0) {
+            return (int) recordRepository.count(new Specification<RecordModel>() {
+                @Override
+                public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                    Predicate condition1 = criteriaBuilder.equal(root.get("equipAddress"), equipAddress);
+                    Predicate condition2 = criteriaBuilder.equal(root.get("overThreshold"), alarm);
+                    return criteriaQuery.where(condition1, condition2).getRestriction();
+                }
+            });
+        }
+        return (int) recordRepository.count(new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("equipAddress"), equipAddress);
+                Predicate condition2 = criteriaBuilder.equal(root.get("recordType"), type);
+                Predicate condition3 = criteriaBuilder.equal(root.get("overThreshold"), alarm);
+                return criteriaQuery.where(condition1, condition2, condition3).getRestriction();
+            }
+        });
+    }
+
+    @Override
+    public Page<RecordModel> getAllRecordByEquipAddress(String equipAddress, int page, int size, Sort sort) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return recordRepository.findAll(new Specification<RecordModel>() {
+            @Override
+            public Predicate toPredicate(Root<RecordModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition1 = criteriaBuilder.equal(root.get("equipAddress"), equipAddress);
+                return criteriaQuery.where(condition1).getRestriction();
+            }
+        }, pageable);
+    }
 }
