@@ -28,13 +28,17 @@ public class RecordController {
 
     @Authorization
     @RequestMapping(value = "/getAll", method = RequestMethod.POST)
-    public ResponseEntity login(@RequestBody String body) {
+    public ResponseEntity getAll(@RequestBody(required=false) String body) {
         JSONObject jsonObject = JSON.parseObject(body);
         if (jsonObject == null) {
-            return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR),  HttpStatus.OK);
+            int page = 0;
+            int size = 20;
+            Sort sort = new Sort(Sort.Direction.DESC, "startTime");
+            Page<RecordModel> result = recordService.getAllRecord(page, size, sort);
+            return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
         } else {
             int page = 0;
-            int size = 50;
+            int size = 20;
             Sort sort = new Sort(Sort.Direction.DESC, "startTime");
             if (jsonObject.containsKey("page")) {
                 page = jsonObject.getIntValue("page");

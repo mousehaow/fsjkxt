@@ -25,7 +25,7 @@ public class TokenManagerImpl implements TokenManager {
         TokenModel model = new TokenModel(userId, token);
 
         //存储到redis并设置过期时间
-        redisTemplate.boundValueOps(token).set(userId.toString(), Constants.TOKEN_EXPIRES_HOUR, TimeUnit.SECONDS);
+        redisTemplate.boundValueOps(token).set(userId.toString(), Constants.TOKEN_EXPIRES_HOUR, TimeUnit.MINUTES);
         return model;
     }
 
@@ -40,7 +40,7 @@ public class TokenManagerImpl implements TokenManager {
             return false;
         }
         model.setUserId(id);
-        redisTemplate.boundValueOps(model.getToken()).expire(Constants.TOKEN_EXPIRES_HOUR, TimeUnit.SECONDS);
+        redisTemplate.boundValueOps(model.getToken()).expire(Constants.TOKEN_EXPIRES_HOUR, TimeUnit.MINUTES);
         return true;
     }
 

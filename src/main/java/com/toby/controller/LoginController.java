@@ -46,7 +46,12 @@ public class LoginController {
                     return new ResponseEntity<>(ResultModel.error(ResultStatus.USERNAME_OR_PASSWORD_ERROR), HttpStatus.OK);
                 }
                 TokenModel model = tokenManager.createToken(userInfo.getId());
-                userInfo.setLoginCount(userInfo.getLoginCount() + 1);
+                if (userInfo.getLoginCount() == null) {
+                    userInfo.setLoginCount(1);
+                } else {
+                    userInfo.setLoginCount(userInfo.getLoginCount() + 1);
+                }
+
                 userService.saveNewUser(userInfo);
                 userInfo.setPassword(null);
                 model.setUser(userInfo);
