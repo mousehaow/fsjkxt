@@ -35,8 +35,10 @@ public class CurrentMapWebSocket {
 
     private Runnable runnable = new Runnable() {
         public void run() {
-            String infoStr = JSON.toJSONString(DataUploadWebSocket.CurrentRecordMap.values());
-            BroadCastInfo(infoStr);
+            if (!DataUploadWebSocket.CurrentRecordMap.isEmpty()) {
+                String infoStr = JSON.toJSONString(DataUploadWebSocket.CurrentRecordMap.values());
+                BroadCastInfo(infoStr);
+            }
         }
     };
 
