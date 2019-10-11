@@ -3,10 +3,13 @@ package com.toby.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.toby.model.TokenModel;
+import com.toby.services.RecordService;
 import com.toby.services.TokenManager;
+import com.toby.utils.ApplicationContextRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -23,9 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ServerEndpoint(value = "/ws/currentMap/{uid}")
 @Component
 public class CurrentMapWebSocket {
-
-    @Autowired
-    private TokenManager tokenManager;
 
     private static Logger log = LoggerFactory.getLogger(CurrentMapWebSocket.class);
     private static final AtomicInteger OnlineCount = new AtomicInteger(0);
@@ -47,6 +47,8 @@ public class CurrentMapWebSocket {
      */
     @OnOpen
     public void onOpen(Session session, @PathParam("uid")String uid) {
+        ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+        TokenManager tokenManager = act.getBean(TokenManager.class);
         TokenModel token = tokenManager.getToken(uid);
         if (token == null) {
             try {
