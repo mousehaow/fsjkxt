@@ -1,11 +1,13 @@
 package com.toby.services;
 
+import com.toby.model.DetailModel;
 import com.toby.model.RecordModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 public interface RecordService {
 
@@ -14,6 +16,9 @@ public interface RecordService {
 
     @Transactional
     RecordModel updateRecord(RecordModel record);
+
+    @Transactional
+    boolean updateSpecialRecord(RecordModel record, List<DetailModel> details);
 
     Page<RecordModel> getAllRecord(int page, int size, Sort sort);
 

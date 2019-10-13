@@ -3,12 +3,11 @@ package com.toby.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.toby.model.TokenModel;
-import com.toby.services.RecordService;
+import com.toby.services.EquipService;
 import com.toby.services.TokenManager;
 import com.toby.utils.ApplicationContextRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -31,14 +30,15 @@ public class CurrentMapWebSocket {
     private static final AtomicInteger OnlineCount = new AtomicInteger(0);
     // concurrent包的线程安全Map，用来存放每个客户端对应的Session对象。
     private static final Map<Session, String> CurrentSessionMap = new ConcurrentHashMap<>();
-    private ScheduledExecutorService sendService = null;
+    private static ScheduledExecutorService sendService = null;
 
     private Runnable runnable = new Runnable() {
         public void run() {
-            if (!DataUploadWebSocket.CurrentRecordMap.isEmpty()) {
-                String infoStr = JSON.toJSONString(DataUploadWebSocket.CurrentRecordMap.values());
-                BroadCastInfo(infoStr);
-            }
+            ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+            EquipService equipService = act.getBean(EquipService.class);
+            String infoStr = JSON.toJSONString(equipService.getAllEquips());
+            //log.info("地图视图下发数据：{}", infoStr);
+            BroadCastInfo(infoStr);
         }
     };
 
@@ -71,6 +71,7 @@ public class CurrentMapWebSocket {
         log.info("地图视图有连接加入，当前连接数为：{}", cnt);
         //SendMessage(session, "连接成功");
         if (cnt != 0 && sendService == null) {
+            log.info("new SendThread：{}", sendService);
             sendService = Executors.newSingleThreadScheduledExecutor();
             sendService.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
         }

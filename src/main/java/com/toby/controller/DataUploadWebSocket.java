@@ -3,8 +3,10 @@ package com.toby.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.toby.model.DetailModel;
+import com.toby.model.EquipModel;
 import com.toby.model.RecordModel;
 import com.toby.services.DetailService;
+import com.toby.services.EquipService;
 import com.toby.services.RecordService;
 import com.toby.utils.ApplicationContextRegister;
 import org.slf4j.Logger;
@@ -28,7 +30,7 @@ public class DataUploadWebSocket {
     // concurrent包的线程安全Map，用来存放每个客户端对应的Session对象。
     private static final Map<Session, String> SessionMap = new ConcurrentHashMap<>();
 
-    static final Map<String, String> CurrentRecordMap = new ConcurrentHashMap<>();
+    //static final Map<String, String> CurrentRecordMap = new ConcurrentHashMap<>();
 
     /**
      * 连接建立成功调用的方法
@@ -41,7 +43,6 @@ public class DataUploadWebSocket {
         ApplicationContext act = ApplicationContextRegister.getApplicationContext();
         RecordService recordService = act.getBean(RecordService.class);
         String recordID = recordService.createNewRecord(recordModel);
-        log.warn(recordID);
         SessionMap.put(session, recordID);
         int cnt = OnlineCount.incrementAndGet(); // 在线数加1
         log.info("有连接加入，当前连接数为：{}", cnt);
@@ -55,7 +56,9 @@ public class DataUploadWebSocket {
     public void onClose(Session session) {
         if (SessionMap.containsKey(session)) {
             String recordId = SessionMap.remove(session);
-            CurrentRecordMap.remove(recordId);
+            ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+            EquipService equipService = act.getBean(EquipService.class);
+            equipService.equipOffline(recordId);
             int cnt = OnlineCount.decrementAndGet();
             log.info("有连接关闭，当前连接数为：{}", cnt);
         }
@@ -71,7 +74,7 @@ public class DataUploadWebSocket {
         //log.info("来自客户端的消息：{}",message);
         JSONObject jsonObject = JSON.parseObject(message);
         String recordId = SessionMap.get(session);
-        log.warn(recordId);
+
         if (recordId == null || recordId.equals("")) {
             return;
         }
@@ -80,9 +83,31 @@ public class DataUploadWebSocket {
             record.setId(recordId);
             record.setCount(0);
             record.setTotalDose(0.0);
+            record.setRecordType(0);
             ApplicationContext act = ApplicationContextRegister.getApplicationContext();
             RecordService recordService = act.getBean(RecordService.class);
             recordService.updateRecord(record);
+            EquipService equipService = act.getBean(EquipService.class);
+            EquipModel equipModel = new EquipModel();
+            equipModel.setId(record.getEquipAddress());
+            equipModel.setLastRecordId(recordId);
+            if (record.getCountry() != null && !record.getCountry().isEmpty()) {
+                equipModel.setCountry(record.getCountry());
+            }
+            if (record.getProvince() != null && !record.getProvince().isEmpty()) {
+                equipModel.setProvince(record.getProvince());
+            }
+            if (record.getCity() != null && !record.getCity().isEmpty()) {
+                equipModel.setCity(record.getCity());
+            }
+            if (record.getLocalDes() != null && !record.getLocalDes().isEmpty()) {
+                equipModel.setLocalDes(record.getLocalDes());
+            }
+            equipModel.setLatitude(record.getLatitude());
+            equipModel.setLongitude(record.getLongitude());
+            equipModel.setTimeStamp(record.getStartTime());
+            equipModel.setThresholdValue(record.getThresholdValue());
+            equipService.equipOnline(equipModel);
         }
         if (jsonObject.getString("type").equals("detailInsert")) {
             DetailModel detail = JSON.parseObject(jsonObject.getString("data"), DetailModel.class);
@@ -90,7 +115,8 @@ public class DataUploadWebSocket {
             ApplicationContext act = ApplicationContextRegister.getApplicationContext();
             DetailService detailService = act.getBean(DetailService.class);
             detailService.addNewDetail(detail);
-            CurrentRecordMap.put(recordId, jsonObject.getString("data"));
+            EquipService equipService = act.getBean(EquipService.class);
+            equipService.updateEquip(detail);
         }
     }
 
@@ -104,7 +130,9 @@ public class DataUploadWebSocket {
         log.error("发生错误：{}，Session ID： {}",error.getMessage(),session.getId());
         if (SessionMap.containsKey(session)) {
             String recordId = SessionMap.remove(session);
-            CurrentRecordMap.remove(recordId);
+            ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+            EquipService equipService = act.getBean(EquipService.class);
+            equipService.equipOffline(recordId);
             OnlineCount.decrementAndGet();
         }
 

@@ -1,6 +1,8 @@
 package com.toby.services.impl;
 
+import com.toby.model.DetailModel;
 import com.toby.model.RecordModel;
+import com.toby.repository.DetailRepository;
 import com.toby.repository.RecordRepository;
 import com.toby.services.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +15,16 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class RecordServiceImpl implements RecordService {
 
     @Autowired
     private RecordRepository recordRepository;
+
+    @Autowired
+    private DetailRepository detailRepository;
 
     @Override
     public String createNewRecord(RecordModel record) {
@@ -31,10 +37,33 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
+    public boolean updateSpecialRecord(RecordModel record, List<DetailModel> details) {
+        RecordModel newModel = recordRepository.saveAndFlush(record);
+        boolean overThresholdValue = false;
+        double totalDose = 0;
+        for (DetailModel model: details) {
+            model.setRecordId(newModel.getId());
+            detailRepository.saveAndFlush(model);
+            if (model.getValue() > record.getThresholdValue()) {
+                overThresholdValue = true;
+            }
+            totalDose += model.getValue();
+        }
+        newModel.setCount(details.size());
+        newModel.setEndTime(details.get(details.size() - 1).getTimeStamp());
+        newModel.setTotalDose(totalDose / 3600);
+        newModel.setOverThreshold(overThresholdValue);
+        recordRepository.saveAndFlush(newModel);
+        return true;
+    }
+
+    @Override
     public Page<RecordModel> getAllRecord(int page, int size, Sort sort) {
         Pageable pageable = PageRequest.of(page, size, sort);
         return recordRepository.findAll(pageable);
     }
+
+
 
     @Override
     public Page<RecordModel> getAllRecordByTime(Date startTime, Date endTime, int page, int size, Sort sort) {

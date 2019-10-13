@@ -1,9 +1,11 @@
 package com.toby.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.toby.annotation.Authorization;
 import com.toby.conf.ResultStatus;
+import com.toby.model.DetailModel;
 import com.toby.model.RecordModel;
 import com.toby.model.ResultModel;
 import com.toby.services.RecordService;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/record")
@@ -32,13 +36,13 @@ public class RecordController {
         JSONObject jsonObject = JSON.parseObject(body);
         if (jsonObject == null) {
             int page = 0;
-            int size = 20;
+            int size = 10;
             Sort sort = new Sort(Sort.Direction.DESC, "startTime");
             Page<RecordModel> result = recordService.getAllRecord(page, size, sort);
             return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
         } else {
             int page = 0;
-            int size = 20;
+            int size = 10;
             Sort sort = new Sort(Sort.Direction.DESC, "startTime");
             if (jsonObject.containsKey("page")) {
                 page = jsonObject.getIntValue("page");
@@ -86,5 +90,26 @@ public class RecordController {
             return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
         }
 
+    }
+
+    @RequestMapping(value = "/uploadSpecial", method = RequestMethod.POST)
+    public ResponseEntity uploadSpecial(@RequestBody(required=false) String body) {
+        JSONObject jsonObject = JSON.parseObject(body);
+        if (jsonObject == null) {
+            return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR),  HttpStatus.OK);
+        } else {
+            RecordModel record = JSON.parseObject(jsonObject.getString("init"), RecordModel.class);
+            record.setRecordType(1);
+            record.setCount(0);
+            record.setTotalDose(0.0);
+            JSONArray array = JSON.parseArray(jsonObject.getString("data"));
+            List<DetailModel> details = new ArrayList<>();
+            for (Object one : array) {
+                DetailModel detail = JSON.parseObject(((JSONObject)one).toJSONString(), DetailModel.class);
+                details.add(detail);
+            }
+            boolean result = recordService.updateSpecialRecord(record, details);
+            return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
+        }
     }
 }
