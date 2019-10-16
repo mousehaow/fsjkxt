@@ -14,4 +14,6 @@ public interface EquipService {
     void updateEquip(DetailModel detailModel);
 
     List<EquipModel> getAllEquips();
+
+    int getEquipCount();
 }

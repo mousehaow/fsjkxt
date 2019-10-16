@@ -36,13 +36,13 @@ public class RecordController {
         JSONObject jsonObject = JSON.parseObject(body);
         if (jsonObject == null) {
             int page = 0;
-            int size = 10;
+            int size = 15;
             Sort sort = new Sort(Sort.Direction.DESC, "startTime");
             Page<RecordModel> result = recordService.getAllRecord(page, size, sort);
             return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
         } else {
             int page = 0;
-            int size = 10;
+            int size = 15;
             Sort sort = new Sort(Sort.Direction.DESC, "startTime");
             if (jsonObject.containsKey("page")) {
                 page = jsonObject.getIntValue("page");

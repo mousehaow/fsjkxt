@@ -90,5 +90,10 @@ public class EquipServiceImpl implements EquipService {
         return equipRepository.findAll(sort);
     }
 
+    @Override
+    public int getEquipCount() {
+        return (int) equipRepository.count();
+    }
+
 
 }
