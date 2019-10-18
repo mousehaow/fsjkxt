@@ -1,5 +1,6 @@
 package com.toby.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ public class AppLoginModel implements Serializable {
     private String id;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date timeStamp;
 
     @Column

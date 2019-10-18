@@ -1,5 +1,6 @@
 package com.toby.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -25,6 +26,7 @@ public class DetailModel implements Serializable {
     private Double electricQuantity;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date timeStamp;
 
     @Column

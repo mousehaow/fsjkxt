@@ -87,7 +87,7 @@ public class RecordController {
                 return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
             }
             result = recordService.getAllRecord(page, size, sort);
-            return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
+            return new ResponseEntity<>(ResultModel.ok(JSON.toJSONString(result)), HttpStatus.OK);
         }
 
     }

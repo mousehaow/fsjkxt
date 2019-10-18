@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 
 @RestController
@@ -51,6 +52,7 @@ public class LoginController {
                 } else {
                     userInfo.setLoginCount(userInfo.getLoginCount() + 1);
                 }
+                userInfo.setLastLoginTime(new Date());
 
                 userService.saveNewUser(userInfo);
                 userInfo.setPassword(null);

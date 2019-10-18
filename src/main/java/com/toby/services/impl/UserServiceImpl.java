@@ -10,7 +10,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -44,6 +50,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<User> searchAll(int page, int size, Sort sort, String search) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<User> specification = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate condition = criteriaBuilder.like(root.get("userName"), "%"+search+"%");
+                return criteriaQuery.where(condition).getRestriction();
+            }
+        };
+        return userRepository.findAll(specification, pageable);
+    }
+
+    @Override
     public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
@@ -53,5 +72,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getUserById(id);
         user.setPassword(newPassword);
         userRepository.saveAndFlush(user);
+    }
+
+    @Override
+    public boolean userNameIsExist(String userName) {
+        int count = userRepository.countByUserNameEquals(userName);
+        return count > 0;
     }
 }

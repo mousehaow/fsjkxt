@@ -1,5 +1,7 @@
 package com.toby.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,6 +22,7 @@ public class EquipModel implements Serializable {
     private Double electricQuantity;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date timeStamp;
 
     @Column

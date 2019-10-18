@@ -1,5 +1,6 @@
 package com.toby.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -20,9 +21,11 @@ public class RecordModel implements Serializable {
     private String id;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date startTime;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date endTime;
 
     @Column

@@ -1,5 +1,6 @@
 package com.toby.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -47,9 +48,11 @@ public class User {
     private String osType;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date registerTime;
 
     @Column
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private Date lastLoginTime;
 
     @Column

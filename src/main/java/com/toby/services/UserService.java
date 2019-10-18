@@ -15,7 +15,11 @@ public interface UserService {
 
     Page<User> getAll(int page, int size, Sort sort);
 
+    Page<User> searchAll(int page, int size, Sort sort, String search);
+
     void deleteUser(String id);
 
     void changePassword(String id, String newPassword);
+
+    boolean userNameIsExist(String userName);
 }

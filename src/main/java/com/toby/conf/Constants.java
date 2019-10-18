@@ -9,7 +9,7 @@ public class Constants {
     /**
      * token有效期（小时）
      */
-    public static final int TOKEN_EXPIRES_HOUR = 24;
+    public static final int TOKEN_EXPIRES_HOUR = 30;
 
     /**
      * 存放Authorization的header字段
