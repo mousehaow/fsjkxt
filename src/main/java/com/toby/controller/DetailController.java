@@ -37,7 +37,7 @@ public class DetailController {
             if (jsonObject.containsKey("recordId")) {
                 recordId = jsonObject.getString("recordId");
                 List<DetailModel> result = detailService.getAllDetail(recordId);
-                return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
+                return new ResponseEntity<>(ResultModel.ok(JSON.toJSONString(result)), HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR), HttpStatus.OK);
             }
