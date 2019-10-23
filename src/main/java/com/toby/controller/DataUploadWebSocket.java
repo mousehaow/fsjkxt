@@ -46,7 +46,7 @@ public class DataUploadWebSocket {
         SessionMap.put(session, recordID);
         int cnt = OnlineCount.incrementAndGet(); // 在线数加1
         log.info("有连接加入，当前连接数为：{}", cnt);
-        SendMessage(session, "连接成功");
+        //SendMessage(session, "连接成功");
     }
 
     /**
@@ -103,8 +103,12 @@ public class DataUploadWebSocket {
             if (record.getLocalDes() != null && !record.getLocalDes().isEmpty()) {
                 equipModel.setLocalDes(record.getLocalDes());
             }
-            equipModel.setLatitude(record.getLatitude());
-            equipModel.setLongitude(record.getLongitude());
+            if (record.getLatitude() != null) {
+                equipModel.setLatitude(record.getLatitude());
+            }
+            if (record.getLongitude() != null) {
+                equipModel.setLongitude(record.getLongitude());
+            }
             equipModel.setTimeStamp(record.getStartTime());
             equipModel.setThresholdValue(record.getThresholdValue());
             equipService.equipOnline(equipModel);
@@ -117,6 +121,23 @@ public class DataUploadWebSocket {
             detailService.addNewDetail(detail);
             EquipService equipService = act.getBean(EquipService.class);
             equipService.updateEquip(detail);
+        }
+        if (jsonObject.getString("type").equals("recordLocation")) {
+            RecordModel record = JSON.parseObject(jsonObject.getString("data"), RecordModel.class);
+            record.setId(recordId);
+            ApplicationContext act = ApplicationContextRegister.getApplicationContext();
+            RecordService recordService = act.getBean(RecordService.class);
+            record = recordService.updateRecordLocation(record);
+            EquipService equipService = act.getBean(EquipService.class);
+            EquipModel equipModel = new EquipModel();
+            equipModel.setId(record.getEquipAddress());
+            equipModel.setCountry(record.getCountry());
+            equipModel.setProvince(record.getProvince());
+            equipModel.setCity(record.getCity());
+            equipModel.setLocalDes(record.getLocalDes());
+            equipModel.setLatitude(record.getLatitude());
+            equipModel.setLongitude(record.getLongitude());
+            equipService.updateEquipLocation(equipModel);
         }
     }
 

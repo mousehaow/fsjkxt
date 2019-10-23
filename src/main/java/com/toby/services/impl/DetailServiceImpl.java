@@ -40,7 +40,7 @@ public class DetailServiceImpl implements DetailService {
 
     @Override
     public List<DetailModel> getAllDetail(String recordId) {
-        Sort sort = new Sort(Sort.Direction.DESC, "timeStamp");
+        Sort sort = new Sort(Sort.Direction.ASC, "timeStamp");
         return detailRepository.findAll(new Specification<DetailModel>() {
             @Override
             public Predicate toPredicate(Root<DetailModel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {

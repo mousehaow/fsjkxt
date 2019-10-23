@@ -1,6 +1,7 @@
 package com.toby.services.impl;
 
 import com.toby.model.DetailModel;
+import com.toby.model.EquipModel;
 import com.toby.model.RecordModel;
 import com.toby.repository.DetailRepository;
 import com.toby.repository.RecordRepository;
@@ -16,6 +17,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecordServiceImpl implements RecordService {
@@ -34,6 +36,24 @@ public class RecordServiceImpl implements RecordService {
     @Override
     public RecordModel updateRecord(RecordModel record) {
         return recordRepository.saveAndFlush(record);
+    }
+
+    @Override
+    public RecordModel updateRecordLocation(RecordModel record) {
+        RecordModel example = new RecordModel();
+        example.setId(record.getId());
+        Optional<RecordModel> optOld = recordRepository.findOne(Example.of(example));
+        if (!optOld.isPresent()) {
+            return null;
+        }
+        RecordModel old = optOld.get();
+        old.setCountry(record.getCountry());
+        old.setProvince(record.getProvince());
+        old.setCity(record.getCity());
+        old.setLocalDes(record.getLocalDes());
+        old.setLatitude(record.getLatitude());
+        old.setLongitude(record.getLongitude());
+        return recordRepository.saveAndFlush(old);
     }
 
     @Override

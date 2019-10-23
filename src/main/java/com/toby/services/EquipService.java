@@ -9,6 +9,8 @@ public interface EquipService {
 
     void equipOnline(EquipModel equip);
 
+    void updateEquipLocation(EquipModel equip);
+
     void equipOffline(String recordId);
 
     void updateEquip(DetailModel detailModel);

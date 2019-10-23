@@ -1,6 +1,7 @@
 package com.toby.services.impl;
 
 
+import com.alibaba.fastjson.JSON;
 import com.toby.model.DetailModel;
 import com.toby.model.EquipModel;
 import com.toby.repository.EquipRepository;
@@ -25,10 +26,12 @@ public class EquipServiceImpl implements EquipService {
         example.setId(equip.getId());
         Optional<EquipModel> optOld = equipRepository.findOne(Example.of(example));
         if (!optOld.isPresent()) {
+            equip.setRecordCount(1);
             equipRepository.saveAndFlush(equip);
             return;
         }
         EquipModel old = optOld.get();
+        old.setRecordCount(old.getRecordCount() + 1);
         old.setLastRecordId(equip.getLastRecordId());
         if (equip.getCountry() != null) {
             old.setCountry(equip.getCountry());
@@ -53,6 +56,37 @@ public class EquipServiceImpl implements EquipService {
         }
         if (equip.getThresholdValue() != null) {
             old.setThresholdValue(equip.getThresholdValue());
+        }
+        System.out.println("Online " + JSON.toJSONString(old));
+        equipRepository.saveAndFlush(old);
+    }
+
+    @Override
+    public void updateEquipLocation(EquipModel equip) {
+        EquipModel example = new EquipModel();
+        example.setId(equip.getId());
+        Optional<EquipModel> optOld = equipRepository.findOne(Example.of(example));
+        if (!optOld.isPresent()) {
+            return;
+        }
+        EquipModel old = optOld.get();
+        if (equip.getCountry() != null) {
+            old.setCountry(equip.getCountry());
+        }
+        if (equip.getProvince() != null) {
+            old.setProvince(equip.getProvince());
+        }
+        if (equip.getCity() != null) {
+            old.setCity(equip.getCity());
+        }
+        if (equip.getLocalDes() != null) {
+            old.setLocalDes(equip.getLocalDes());
+        }
+        if (equip.getLatitude() != null) {
+            old.setLatitude(equip.getLatitude());
+        }
+        if (equip.getLongitude() != null) {
+            old.setLongitude(equip.getLongitude());
         }
         equipRepository.saveAndFlush(old);
     }

@@ -17,6 +17,8 @@ public interface RecordService {
     @Transactional
     RecordModel updateRecord(RecordModel record);
 
+    RecordModel updateRecordLocation(RecordModel record);
+
     @Transactional
     boolean updateSpecialRecord(RecordModel record, List<DetailModel> details);
 

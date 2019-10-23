@@ -47,10 +47,13 @@ public class EquipModel implements Serializable {
     private String localDes;
 
     @Column
-    private Double  thresholdValue = 1.0;
+    private Double  thresholdValue;
 
     @Column
     private String lastRecordId;
+
+    @Column
+    private Integer recordCount;
 
     public EquipModel() {
     }
@@ -157,5 +160,13 @@ public class EquipModel implements Serializable {
 
     public void setLastRecordId(String lastRecordId) {
         this.lastRecordId = lastRecordId;
+    }
+
+    public Integer getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(Integer recordCount) {
+        this.recordCount = recordCount;
     }
 }
