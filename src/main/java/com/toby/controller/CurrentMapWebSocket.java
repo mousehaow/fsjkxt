@@ -71,7 +71,7 @@ public class CurrentMapWebSocket {
         log.info("地图视图有连接加入，当前连接数为：{}", cnt);
         //SendMessage(session, "连接成功");
         if (cnt != 0 && sendService == null) {
-            log.info("new SendThread：{}", sendService);
+            log.info("new SendThread：{}");
             sendService = Executors.newSingleThreadScheduledExecutor();
             sendService.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.SECONDS);
         }

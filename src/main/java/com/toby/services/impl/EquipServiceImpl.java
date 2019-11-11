@@ -125,6 +125,11 @@ public class EquipServiceImpl implements EquipService {
     }
 
     @Override
+    public EquipModel getEquipById(String id) {
+        return equipRepository.getById(id);
+    }
+
+    @Override
     public int getEquipCount() {
         return (int) equipRepository.count();
     }

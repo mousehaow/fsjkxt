@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EquipRepository extends JpaRepository<EquipModel, String> {
     EquipModel getByLastRecordId(String recrodId);
+    EquipModel getById(String equipId);
 }

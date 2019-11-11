@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.toby.annotation.Authorization;
 import com.toby.conf.ResultStatus;
+import com.toby.model.EquipModel;
 import com.toby.model.RecordModel;
 import com.toby.model.ResultModel;
+import com.toby.services.EquipService;
 import com.toby.services.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,9 @@ public class EquipController {
 
     @Autowired
     private RecordService recordService;
+
+    @Autowired
+    private EquipService equipService;
 
     @Authorization
     @RequestMapping(value = "/getInfo", method = RequestMethod.POST)
@@ -50,6 +55,24 @@ public class EquipController {
     }
 
     @Authorization
+    @RequestMapping(value = "/getEquipInfo", method = RequestMethod.POST)
+    public ResponseEntity getEquipInfo(@RequestBody String body) {
+        JSONObject jsonObject = JSON.parseObject(body);
+        if (jsonObject == null) {
+            return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR),  HttpStatus.OK);
+        } else {
+            String equipId;
+            if (jsonObject.containsKey("equipId")) {
+                equipId = jsonObject.getString("equipId");
+            } else {
+                return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR), HttpStatus.OK);
+            }
+            EquipModel result =  equipService.getEquipById(equipId);
+            return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
+        }
+    }
+
+    @Authorization
     @RequestMapping(value = "/getRecordList", method = RequestMethod.POST)
     public ResponseEntity getRecordList(@RequestBody String body) {
         JSONObject jsonObject = JSON.parseObject(body);
@@ -63,7 +86,7 @@ public class EquipController {
                 return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR), HttpStatus.OK);
             }
             int page = 0;
-            int size = 50;
+            int size = 15;
             Sort sort = new Sort(Sort.Direction.DESC, "startTime");
             if (jsonObject.containsKey("page")) {
                 page = jsonObject.getIntValue("page");
@@ -75,7 +98,7 @@ public class EquipController {
                 sort = new Sort(Sort.Direction.DESC, jsonObject.getString("sort"));
             }
             Page<RecordModel> result = recordService.getAllRecordByEquipAddress(equipAddress, page, size, sort);
-            return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
+            return new ResponseEntity<>(ResultModel.ok(JSON.toJSONString(result)), HttpStatus.OK);
         }
     }
 

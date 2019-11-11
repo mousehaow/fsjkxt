@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.toby.annotation.Authorization;
+import com.toby.annotation.CurrentUser;
 import com.toby.conf.ResultStatus;
 import com.toby.model.DetailModel;
 import com.toby.model.RecordModel;
 import com.toby.model.ResultModel;
+import com.toby.model.User;
 import com.toby.services.RecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -110,6 +112,32 @@ public class RecordController {
             }
             boolean result = recordService.updateSpecialRecord(record, details);
             return new ResponseEntity<>(ResultModel.ok(result), HttpStatus.OK);
+        }
+    }
+
+    @Authorization
+    @RequestMapping(value = "/deleteRecord", method = RequestMethod.POST)
+    public ResponseEntity deleteRecord(@CurrentUser User user,
+                                     @RequestBody String body) {
+        if (user.getAuthority() == 0) {
+            JSONObject jsonObject = JSON.parseObject(body);
+            if (jsonObject == null) {
+                return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR), HttpStatus.OK);
+            } else {
+                String recordId = null;
+                if (jsonObject.containsKey("recordId")) {
+                    recordId = jsonObject.getString("recordId");
+                }
+                if (recordId != null) {
+                    recordService.deleteRecord(recordId);
+                    return new ResponseEntity<>(ResultModel.ok("记录删除成功"), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(ResultModel.error(ResultStatus.PARAM_ERROR), HttpStatus.OK);
+                }
+
+            }
+        } else {
+            return new ResponseEntity<>(ResultModel.error(ResultStatus.NO_AUTHORITY), HttpStatus.OK);
         }
     }
 }

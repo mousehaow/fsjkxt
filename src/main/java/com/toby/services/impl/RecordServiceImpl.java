@@ -220,4 +220,9 @@ public class RecordServiceImpl implements RecordService {
             }
         }, pageable);
     }
+
+    @Override
+    public void deleteRecord(String id) {
+        recordRepository.deleteById(id);
+    }
 }

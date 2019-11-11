@@ -42,4 +42,5 @@ public interface RecordService {
 
     Page<RecordModel> getAllRecordByEquipAddress(String equipAddress, int page, int size, Sort sort);
 
+    void deleteRecord(String id);
 }

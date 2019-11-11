@@ -17,5 +17,7 @@ public interface EquipService {
 
     List<EquipModel> getAllEquips();
 
+    EquipModel getEquipById(String id);
+
     int getEquipCount();
 }
