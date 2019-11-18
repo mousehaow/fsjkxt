@@ -45,10 +45,10 @@ public class EquipServiceImpl implements EquipService {
         if (equip.getLocalDes() != null) {
             old.setLocalDes(equip.getLocalDes());
         }
-        if (equip.getLatitude() != null) {
+        if (equip.getLatitude() != null && equip.getLatitude() != 0) {
             old.setLatitude(equip.getLatitude());
         }
-        if (equip.getLongitude() != null) {
+        if (equip.getLongitude() != null && equip.getLongitude() != 0) {
             old.setLongitude(equip.getLongitude());
         }
         if (equip.getTimeStamp() != null) {
@@ -82,10 +82,10 @@ public class EquipServiceImpl implements EquipService {
         if (equip.getLocalDes() != null) {
             old.setLocalDes(equip.getLocalDes());
         }
-        if (equip.getLatitude() != null) {
+        if (equip.getLatitude() != null && equip.getLatitude() != 0) {
             old.setLatitude(equip.getLatitude());
         }
-        if (equip.getLongitude() != null) {
+        if (equip.getLongitude() != null && equip.getLongitude() != 0) {
             old.setLongitude(equip.getLongitude());
         }
         equipRepository.saveAndFlush(old);
@@ -101,8 +101,12 @@ public class EquipServiceImpl implements EquipService {
         }
         EquipModel equipModel = optOld.get();
         equipModel.setTimeStamp(detailModel.getTimeStamp());
-        equipModel.setLatitude(detailModel.getLatitude());
-        equipModel.setLongitude(detailModel.getLongitude());
+        if (detailModel.getLatitude() != 0) {
+            equipModel.setLatitude(detailModel.getLatitude());
+        }
+        if (detailModel.getLongitude() != 0) {
+            equipModel.setLongitude(detailModel.getLongitude());
+        }
         equipModel.setValue(detailModel.getValue());
         equipModel.setElectricQuantity(detailModel.getElectricQuantity());
         equipModel.setOnline(true);
